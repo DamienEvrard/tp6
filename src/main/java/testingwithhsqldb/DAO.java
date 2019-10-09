@@ -5,6 +5,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import javax.sql.DataSource;
+import testingwithhsqldb.entities.ProductEntity;
 
 public class DAO {
 	private final DataSource myDataSource;
@@ -38,5 +39,43 @@ public class DAO {
 		// dernière ligne : on renvoie le résultat
 		return result;
 	}
+        
+        /**
+	 * Insert un nouveau produit dans la table Product
+	 * @param id la clé du produit
+         * @param name le nom du produit
+         * @param price le prix du produit
+	 * @throws SQLException 
+	 */
+	public void addProduct(int id, String name, double price) throws SQLException {
+            String sql = "INSERT INTO Product (ID, Name, Price) VALUES (?,?,?)";
+		try (Connection myConnection = myDataSource.getConnection(); 
+		     PreparedStatement statement = myConnection.prepareStatement(sql)) {
+			statement.setInt(1, id); // On fixe le 1° paramètre de la requête
+                        statement.setString(2, name); // On fixe le 2° paramètre de la requête
+                        statement.setDouble(3, price); // On fixe le 3° paramètre de la requête
+			statement.executeUpdate();
+		}
+        }
+        
+        /**
+	 * Insert un nouveau produit dans la table Product
+	 * @param id la clé du produit
+	 * @throws SQLException 
+	 */
+	public ProductEntity getProduct(int id) throws SQLException {
+            ProductEntity produit;
+            String sql = "SELECT ID, Name, Price FROM Product WHERE ID = ?";
+		try (Connection myConnection = myDataSource.getConnection(); 
+		     PreparedStatement statement = myConnection.prepareStatement(sql)) {
+			statement.setInt(1, id); // On fixe le 1° paramètre de la requête
+			statement.executeQuery();
+                        try ( ResultSet resultSet = statement.executeQuery()) {
+                            resultSet.next();
+                            produit = new ProductEntity(resultSet.getInt("ID"), resultSet.getString("Name"), resultSet.getDouble("Price"));
+                        }
+		}
+                return produit;
+        }
 	
 }

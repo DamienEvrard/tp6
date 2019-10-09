@@ -12,6 +12,7 @@ import static org.junit.Assert.*;
 
 import org.hsqldb.cmdline.SqlFile;
 import org.hsqldb.cmdline.SqlToolError;
+import testingwithhsqldb.entities.ProductEntity;
 
 
 public class HsqlDBTest {
@@ -70,4 +71,40 @@ public class HsqlDBTest {
 		ds.setPassword("sa");
 		return ds;
 	}	
+        
+        @Test
+	public void addProduct() {
+            try{
+                myObject.addProduct(9000, "Pilou", 1000);
+            }catch(Exception e){
+                fail("l' insertion a échoué");
+            }     
+	}
+        
+        @Test
+	public void addExistingProduct() {
+            try{
+                myObject.addProduct(0, "Pilou", 1000);
+                fail("l' insertion aurait du échoué");
+            }catch(Exception e){
+                
+            }     
+	}
+        
+        @Test
+	public void findExistingProduct() throws SQLException {
+		ProductEntity produit = myObject.getProduct(0);
+		assertEquals("Bad product found !", "Iron Iron", produit.getName());
+	}
+        
+        @Test
+	public void pricePositive() {
+		 try{
+                myObject.addProduct(8000, "Pilou", -1000);
+                fail("le prix doit etre positif!");
+            }catch(Exception e){
+                
+            } 
+	}
+        
 }
